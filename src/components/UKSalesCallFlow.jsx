@@ -516,6 +516,7 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
           {currentStep === 'sell' && (<>
             <div style={sectionHeaderStyle}><h2 style={{ margin: 0, fontSize: '22px', fontWeight: '800' }}>SELL THE VACATION</h2><p style={{ margin: '4px 0 0 0', fontSize: '13px', opacity: 0.85 }}>What They Get (2-3 min)</p></div>
             <div style={tipBoxStyle}><strong>🎯 GOAL:</strong> Sell the outcome AND set clear expectations.</div>
+            <div style={warningBoxStyle}><strong>⚠️ Don't just read the script.</strong> Use it as a base, but tailor it to this lead. Connect the key features back to {painPoints ? <><strong>"{painPoints}"</strong> — their words</> : 'their specific pain points (capture them in the sidebar)'}. The parent should feel like this presentation was built for them.</div>
 
             {primaryChild.yearGroup && primaryChild.yearGroup !== 'Other' && (<div style={{ background: colors.white, padding: '12px 16px', marginBottom: '16px', borderRadius: 0, display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', border: '1px solid #e0e0e0' }}><span style={{ fontSize: '12px', fontWeight: '700' }}>📅</span>{timetableLinks[primaryChild.yearGroup] && <a href={timetableLinks[primaryChild.yearGroup]} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: colors.primary, fontWeight: '600', textDecoration: 'none' }}>{primaryChild.yearGroup} Timetable →</a>}{primaryChild.subjects.map(subj => (curriculumLinks[primaryChild.yearGroup]?.[subj] && <a key={subj} href={curriculumLinks[primaryChild.yearGroup][subj]} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: colors.primary, fontWeight: '600', textDecoration: 'none' }}>{subj} Curriculum →</a>))}</div>)}
 
@@ -554,7 +555,9 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                 <br /><br />
                 The teacher teaches live - it's interactive, not passive. Students ask questions in chat, work through problems together.
                 <br /><br />
-                On average, <strong>each student sends around 25 messages per lesson</strong> - that level of engagement is incomparable to a normal classroom."
+                On average, <strong>each student sends around 25 messages per lesson</strong> - that level of engagement is incomparable to a normal classroom.
+                <br /><br />
+                Does that make sense?"
               </p>
             </div>
             <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.primary}` }}>
@@ -578,7 +581,9 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                 <br /><br />
                 So if {displayName(primaryChild)} misses a class - football practice, family dinner, whatever - they just watch the recording. They don't fall behind.
                 <br /><br />
-                Some kids actually prefer the recordings because they can pause and rewatch the tricky parts."
+                Some kids actually prefer the recordings because they can pause and rewatch the tricky parts.
+                <br /><br />
+                Sound good so far?"
               </p>
             </div>
             {isExamYear(primaryChild.yearGroup) && (
