@@ -91,24 +91,69 @@ const curriculumLinks = {
   'Year 12': { Maths: 'https://myedspace.co.uk/Year12-Maths-Curriculum', Biology: 'https://myedspace.co.uk/Year12-Biology-AQA-Curriculum', Chemistry: 'https://myedspace.co.uk/Year12-Chemistry-AQA-Curriculum', Physics: 'https://myedspace.co.uk/Year12-Physics-Curriculum', 'Further Maths': 'https://myedspace.co.uk/Year12-Further-Maths-Curriculum' },
   'Year 13': { Maths: 'https://myedspace.co.uk/Year13-Maths-Curriculum', Biology: 'https://myedspace.co.uk/Year13-Biology-AQA-Curriculum', Chemistry: 'https://myedspace.co.uk/Year13-Chemistry-AQA-Curriculum', Physics: 'https://myedspace.co.uk/Year13-Physics-Curriculum', 'Further Maths': 'https://myedspace.co.uk/Year13-Further-Maths-Curriculum' },
 };
+// Pricing per year group — annual prices are uniform, but original prices and lesson counts vary by year group
+const getLessonsForYearGroup = (yg, subjectCount, isMultiYear) => {
+  const perSubject = isMultiYear
+    ? (['Year 11'].includes(yg) ? 132 : ['Year 10', 'Year 12'].includes(yg) ? 140 : 148)
+    : (['Year 11', 'Year 13'].includes(yg) ? 66 : 74);
+  if (subjectCount >= 3) {
+    // Ultimate Pass lesson counts from tables
+    if (isMultiYear) {
+      if (yg === 'Year 9') return 592;
+      if (yg === 'Year 10') return 700;
+      if (yg === 'Year 11') return 660;
+      if (yg === 'Year 12') return 420;
+      return 444;
+    } else {
+      if (yg === 'Year 10') return 370;
+      if (yg === 'Year 11') return 330;
+      if (yg === 'Year 13') return 198;
+      return 222;
+    }
+  }
+  return perSubject * subjectCount;
+};
+const getOriginalPrice = (yg, subjectCount, isMultiYear) => {
+  const tier = subjectCount >= 3 ? 'ultimate' : subjectCount;
+  if (isMultiYear) {
+    // Table 5: Standard Multi-Year originals
+    const isY10Y11Y12 = ['Year 10', 'Year 11', 'Year 12'].includes(yg);
+    if (tier === 1) return isY10Y11Y12 ? 1200 : 1280;
+    if (tier === 2) return isY10Y11Y12 ? 2160 : 2304;
+    return isY10Y11Y12 ? 2700 : 2880;
+  } else {
+    // Table 3: Standard Current Year originals
+    const isY11Y13 = ['Year 11', 'Year 13'].includes(yg);
+    if (tier === 1) return isY11Y13 ? 400 : 480;
+    if (tier === 2) return isY11Y13 ? 720 : 864;
+    return isY11Y13 ? 900 : 1080;
+  }
+};
+const getProOriginalPrice = (yg, subjectCount, isMultiYear) => {
+  const tier = subjectCount >= 3 ? 'ultimate' : subjectCount;
+  if (isMultiYear) {
+    // Table 9: Pro Multi-Year originals
+    const isY10Y11Y12 = ['Year 10', 'Year 11', 'Year 12'].includes(yg);
+    if (tier === 1) return isY10Y11Y12 ? 1650 : 1760;
+    if (tier === 2) return isY10Y11Y12 ? 2970 : 3168;
+    return isY10Y11Y12 ? 3600 : 3840;
+  } else {
+    // Table 7: Pro Current Year originals
+    const isY11Y13 = ['Year 11', 'Year 13'].includes(yg);
+    if (tier === 1) return isY11Y13 ? 550 : 660;
+    if (tier === 2) return isY11Y13 ? 990 : 1188;
+    return isY11Y13 ? 1200 : 1440;
+  }
+};
 const standardPricing = {
-  currentYear: { 1: { annual: 319, original: 480, lessons: 74 }, 2: { annual: 574.20, original: 864, lessons: 148 }, ultimate: { annual: 789, original: 1080, lessons: 222 } },
-  currentYearY11Y13: { 1: { annual: 319, original: 400, lessons: 66 }, 2: { annual: 574.20, original: 720, lessons: 132 }, ultimate: { annual: 789, original: 900, lessons: 330 } },
-  multiYear: { 1: { annual: 669, original: 1280, lessons: 148 }, 2: { annual: 1204.20, original: 2304, lessons: 296 }, ultimate: { annual: 1589, original: 2880, lessons: 444 } },
-  multiYearY10Y11Y12: { 1: { annual: 669, original: 1200, lessons: 140 }, 2: { annual: 1204.20, original: 2160, lessons: 280 }, ultimate: { annual: 1589, original: 2700, lessons: 700 } },
+  currentYear: { 1: { annual: 269 }, 2: { annual: 484.20 }, ultimate: { annual: 639 } },
+  multiYear: { 1: { annual: 639 }, 2: { annual: 1150.20 }, ultimate: { annual: 1519 } },
   monthly: { 1: 80, 2: 144, ultimate: 180 },
 };
 const proPricing = {
-  currentYear: { 1: { annual: 449, original: 660, lessons: 74 }, 2: { annual: 808.20, original: 1188, lessons: 148 }, ultimate: { annual: 939, original: 1440, lessons: 222 } },
-  currentYearY10: { 1: { annual: 449, original: 660, lessons: 74 }, 2: { annual: 808.20, original: 1188, lessons: 148 }, ultimate: { annual: 939, original: 1440, lessons: 370 } },
-  currentYearY11: { 1: { annual: 449, original: 550, lessons: 66 }, 2: { annual: 808.20, original: 990, lessons: 132 }, ultimate: { annual: 939, original: 1200, lessons: 330 } },
-  currentYearY13: { 1: { annual: 449, original: 550, lessons: 66 }, 2: { annual: 808.20, original: 990, lessons: 132 }, ultimate: { annual: 939, original: 1200, lessons: 198 } },
-  multiYear: { 1: { annual: 979, original: 1760, lessons: 148 }, 2: { annual: 1762.20, original: 3168, lessons: 296 }, ultimate: { annual: 1999, original: 3840, lessons: 444 } },
-  multiYearY9: { 1: { annual: 979, original: 1760, lessons: 148 }, 2: { annual: 1762.20, original: 3168, lessons: 296 }, ultimate: { annual: 1999, original: 3840, lessons: 592 } },
-  multiYearY10: { 1: { annual: 979, original: 1650, lessons: 148 }, 2: { annual: 1762.20, original: 2970, lessons: 280 }, ultimate: { annual: 1999, original: 3600, lessons: 700 } },
-  multiYearY11: { 1: { annual: 979, original: 1650, lessons: 132 }, 2: { annual: 1762.20, original: 2970, lessons: 264 }, ultimate: { annual: 1999, original: 3600, lessons: 660 } },
-  multiYearY12: { 1: { annual: 979, original: 1650, lessons: 148 }, 2: { annual: 1762.20, original: 2970, lessons: 280 }, ultimate: { annual: 1999, original: 3600, lessons: 420 } },
-  monthly: { 1: 120, 2: 216, ultimate: 270 },
+  currentYear: { 1: { annual: 369 }, 2: { annual: 664.20 }, ultimate: { annual: 809 } },
+  multiYear: { 1: { annual: 929 }, 2: { annual: 1672.20 }, ultimate: { annual: 1899 } },
+  monthly: { 1: 110, 2: 198, ultimate: 240 },
 };
 const subjectsByYear = {
   'Year 5': ['Maths', 'English', 'Science', '11+'],
@@ -195,36 +240,21 @@ export default function UKSalesCallFlow() {
     const subjectCount = child.subjects.length || 1;
     const multi = isMultiYear(yg);
 
-    let priceTable;
-    if (isPro) {
-      if (multi) {
-        if (yg === 'Year 9') priceTable = pricing.multiYearY9;
-        else if (yg === 'Year 10') priceTable = pricing.multiYearY10;
-        else if (yg === 'Year 11') priceTable = pricing.multiYearY11;
-        else if (yg === 'Year 12') priceTable = pricing.multiYearY12;
-        else priceTable = pricing.multiYear;
-      } else {
-        if (yg === 'Year 10') priceTable = pricing.currentYearY10;
-        else if (yg === 'Year 11') priceTable = pricing.currentYearY11;
-        else if (yg === 'Year 13') priceTable = pricing.currentYearY13;
-        else priceTable = pricing.currentYear;
-      }
-    } else {
-      const isY11Y13 = yg === 'Year 11' || yg === 'Year 13';
-      const isY10Y11Y12 = ['Year 10', 'Year 11', 'Year 12'].includes(yg);
-      priceTable = multi ? (isY10Y11Y12 ? pricing.multiYearY10Y11Y12 : pricing.multiYear) : (isY11Y13 ? pricing.currentYearY11Y13 : pricing.currentYear);
-    }
-
+    const priceTable = multi ? pricing.multiYear : pricing.currentYear;
     const tier = subjectCount >= 3 ? 'ultimate' : subjectCount;
     const tierData = priceTable[tier] || priceTable[1];
-    const monthlyPrice = pricing.monthly[tier >= 3 ? 'ultimate' : tier] || pricing.monthly[1];
-    const phoneDiscount = tierData.annual * 0.95;
+    const monthlyTier = tier === 'ultimate' || subjectCount >= 3 ? 'ultimate' : tier;
+    const monthlyPrice = pricing.monthly[monthlyTier] || pricing.monthly[1];
+    const lessons = getLessonsForYearGroup(yg, subjectCount, multi);
+    const original = isPro ? getProOriginalPrice(yg, subjectCount, multi) : getOriginalPrice(yg, subjectCount, multi);
+    const annual = tierData.annual;
+    const phoneDiscount = annual * 0.95;
 
     return {
-      annual: tierData.annual, original: tierData.original, lessons: tierData.lessons, monthly: monthlyPrice,
-      instalments3: (tierData.annual / 3).toFixed(2), upfront: (tierData.annual * 0.95).toFixed(2),
-      phonePrice: phoneDiscount.toFixed(2), saving: (tierData.original - tierData.annual).toFixed(0),
-      phoneSaving: (tierData.original - phoneDiscount).toFixed(0), pricePerHour: (tierData.annual / tierData.lessons).toFixed(2),
+      annual, original, lessons, monthly: monthlyPrice,
+      instalments3: (annual / 3).toFixed(2), upfront: (annual * 0.95).toFixed(2),
+      phonePrice: phoneDiscount.toFixed(2), saving: (original - annual).toFixed(0),
+      phoneSaving: (original - phoneDiscount).toFixed(0), pricePerHour: (annual / lessons).toFixed(2),
       subjectCount, lessonsPerMonth: subjectCount * 8, tutorCost: subjectCount * 8 * 50, isMultiYear: multi,
     };
   };
@@ -736,9 +766,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                       const subjectKey = primaryPricing.subjectCount === 1 ? 1 : primaryPricing.subjectCount === 2 ? 2 : 'ultimate';
                       return currentYearPricing[subjectKey]?.annual;
                     })()} <span style={{ color: colors.darkGray }}>(was £{(() => {
-                      const currentYearPricing = isPro ? proPricing.currentYear : standardPricing.currentYear;
-                      const subjectKey = primaryPricing.subjectCount === 1 ? 1 : primaryPricing.subjectCount === 2 ? 2 : 'ultimate';
-                      return currentYearPricing[subjectKey]?.original;
+                      const subjectCount = primaryPricing.subjectCount;
+                      return isPro ? getProOriginalPrice(primaryChild.yearGroup, subjectCount, false) : getOriginalPrice(primaryChild.yearGroup, subjectCount, false);
                     })()})</span>
                     <br />
                     <strong>3 instalments:</strong> £{(() => {
@@ -796,9 +825,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                       const subjectKey = primaryPricing.subjectCount === 1 ? 1 : primaryPricing.subjectCount === 2 ? 2 : 'ultimate';
                       return multiYearPricing[subjectKey]?.annual;
                     })()} <span style={{ color: colors.darkGray }}>(was £{(() => {
-                      const multiYearPricing = isPro ? proPricing.multiYear : standardPricing.multiYear;
-                      const subjectKey = primaryPricing.subjectCount === 1 ? 1 : primaryPricing.subjectCount === 2 ? 2 : 'ultimate';
-                      return multiYearPricing[subjectKey]?.original;
+                      const subjectCount = primaryPricing.subjectCount;
+                      return isPro ? getProOriginalPrice(primaryChild.yearGroup, subjectCount, true) : getOriginalPrice(primaryChild.yearGroup, subjectCount, true);
                     })()})</span>
                     <br />
                     <strong>3 instalments:</strong> £{(() => {
