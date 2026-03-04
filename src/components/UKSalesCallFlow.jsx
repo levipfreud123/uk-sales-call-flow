@@ -183,6 +183,7 @@ export default function UKSalesCallFlow() {
   const [copied, setCopied] = useState(false);
   const [trialSection, setTrialSection] = useState('touches');
   const [showTrialPricing, setShowTrialPricing] = useState(false);
+  const [showTrialObjections, setShowTrialObjections] = useState(false);
   const [copiedTrial, setCopiedTrial] = useState(null);
   const copyTrialText = (id, text) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -363,8 +364,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
           <button onClick={() => setCurrentStep('objections')} style={{ padding: '5px 12px', background: colors.warning, color: colors.white, border: 'none', fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>OBJECTIONS</button>
         </div>}
         {viewMode === 'trial' && <div style={{ display: 'flex', gap: '8px', position: 'relative' }}>
-          <button onClick={() => setShowTrialPricing(!showTrialPricing)} style={{ padding: '5px 12px', background: showTrialPricing ? colors.success : 'transparent', color: showTrialPricing ? colors.white : '#ccc', border: `1px solid ${showTrialPricing ? colors.success : '#555'}`, fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>PRICING</button>
-          <button onClick={() => setTrialSection(trialSection === 'objections' ? 'touches' : 'objections')} style={{ padding: '5px 12px', background: trialSection === 'objections' ? colors.warning : colors.warning, color: colors.white, border: 'none', fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>OBJECTIONS</button>
+          <button onClick={() => { setShowTrialPricing(!showTrialPricing); setShowTrialObjections(false); }} style={{ padding: '5px 12px', background: showTrialPricing ? colors.success : 'transparent', color: showTrialPricing ? colors.white : '#ccc', border: `1px solid ${showTrialPricing ? colors.success : '#555'}`, fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>PRICING</button>
+          <button onClick={() => { setShowTrialObjections(!showTrialObjections); setShowTrialPricing(false); }} style={{ padding: '5px 12px', background: colors.warning, color: colors.white, border: showTrialObjections ? '2px solid #fff' : 'none', fontSize: '11px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>OBJECTIONS</button>
           {showTrialPricing && <div style={{ position: 'absolute', top: '36px', right: '0', width: '280px', background: colors.white, border: '1px solid #e0e0e0', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 200, fontFamily: 'Inter, sans-serif' }}>
             <div style={{ background: colors.dark, padding: '10px 14px' }}>
               <p style={{ margin: 0, fontSize: '11px', fontWeight: '700', color: colors.white, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Pricing Reference</p>
@@ -1085,6 +1086,46 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
       </div>
       </>}
       {viewMode === 'trial' && <>
+        {/* Objections panel — collapsible bar under header */}
+        {showTrialObjections && <div style={{ background: '#fff8f0', borderBottom: `3px solid ${colors.warning}`, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <span style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: colors.warning, fontFamily: 'Inter, sans-serif' }}>OBJECTION HANDLING</span>
+              <button onClick={() => setShowTrialObjections(false)} style={{ padding: '2px 8px', background: 'transparent', border: '1px solid #ddd', color: colors.darkGray, fontSize: '10px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>CLOSE</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0', position: 'relative' }}>
+                <CopyBtn id="obj-expensive" text={`"Totally understand — £749 feels significant.\n\nQuick comparison: a private tutor in the UK charges £40–60 an hour. Two sessions a week is £400–500 a month, for one random tutor with no curriculum, no homework support, no replays.\n\nThis is £749.55 for the full year — or 3 x £263 — with [Teacher Name], structured lessons twice a week, workbooks, homework, and video solutions for every question. And you're covered by a 14-day money-back guarantee.\n\nIf the value's there, does price change how you feel?"`} />
+                <p style={{ margin: '0 0 6px 0', fontSize: '11px', fontWeight: '700', color: colors.warning, fontFamily: 'Inter, sans-serif' }}>"It's too expensive"</p>
+                <p style={{ margin: 0, fontSize: '12px', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
+                  "Totally understand — £749 feels significant. A private tutor is £40–60/hr, two sessions a week is £400–500 a month. This is <strong>£749.55 for the full year</strong> — or <strong>3 x £263</strong>. 14-day money-back guarantee."
+                </p>
+                <p style={{ margin: '6px 0 0 0', fontSize: '11px', color: colors.darkGray, fontFamily: 'Inter, sans-serif' }}><strong>Still hesitant →</strong> "We can split it into 3 payments of £263."</p>
+              </div>
+              <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0', position: 'relative' }}>
+                <CopyBtn id="obj-think" text={`"Completely fair. What's the main thing you're weighing? Is it the price, whether it'll work for [Student], or something else?"\n\n"Here's the thing — you're not going to go home, sit down, and think about maths tuition. You'll get busy, [Student] will have another homework battle, and the trial will expire.\n\nIt doesn't take more time to decide — it takes more information. What question do you still have that I can answer right now?"`} />
+                <p style={{ margin: '0 0 6px 0', fontSize: '11px', fontWeight: '700', color: colors.warning, fontFamily: 'Inter, sans-serif' }}>"I need to think about it"</p>
+                <p style={{ margin: 0, fontSize: '12px', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
+                  "What's the main thing you're weighing?" ... "You're not going to sit down and think about tuition. You'll get busy, trial will expire. <strong>It doesn't take more time — it takes more information.</strong> What question can I answer now?"
+                </p>
+              </div>
+              <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0', position: 'relative' }}>
+                <CopyBtn id="obj-partner" text={`"Makes complete sense. What do you think they'd want to know most?"\n\n"One option: start the monthly plan tonight at £180. That way you can show your partner what [Student] has been doing — much easier than explaining it. Cancel anytime if they're not happy. Fair?"`} />
+                <p style={{ margin: '0 0 6px 0', fontSize: '11px', fontWeight: '700', color: colors.warning, fontFamily: 'Inter, sans-serif' }}>"Need to talk to my partner"</p>
+                <p style={{ margin: 0, fontSize: '12px', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
+                  "What do you think they'd want to know most?" ... "Start <strong>monthly at £180</strong> tonight — show your partner what [Student] has been doing. Much easier than explaining it. Cancel anytime."
+                </p>
+              </div>
+              <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0', position: 'relative' }}>
+                <CopyBtn id="obj-1to1" text={`"That makes sense — 1-to-1 feels more personal. The question is whether personalisation actually drives better results, or whether it's the consistency and curriculum structure that matters.\n\nWhat most parents find is that [Teacher Name] teaches to the group but the workbooks, homework, and replays give [Student] the individual practice. It's the combination that works.\n\nWould you be open to giving them a few more lessons to see? Most students who feel like they need 1-to-1 actually thrive in this format once they're used to it."`} />
+                <p style={{ margin: '0 0 6px 0', fontSize: '11px', fontWeight: '700', color: colors.warning, fontFamily: 'Inter, sans-serif' }}>"We prefer 1-to-1"</p>
+                <p style={{ margin: 0, fontSize: '12px', lineHeight: '1.7', fontFamily: 'Inter, sans-serif' }}>
+                  "1-to-1 feels personal — but consistency and curriculum structure drive results. [Teacher Name] teaches the group, workbooks and replays give individual practice. <strong>It's the combination that works.</strong>"
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>}
         {/* Trial content — centered */}
         <div style={{ maxWidth: '780px', margin: '0 auto', padding: '24px 20px' }}>
 
@@ -1496,53 +1537,6 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
           </>}
         </>}
 
-        {trialSection === 'objections' && <>
-          <div style={{ ...sectionHeaderStyle, background: colors.warning }}><h2 style={{ margin: 0, fontSize: '22px', fontWeight: '800' }}>TRIAL OBJECTION HANDLING</h2></div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
-            <CopyBtn id="obj-expensive" text={`"Totally understand — £749 feels significant.\n\nQuick comparison: a private tutor in the UK charges £40–60 an hour. Two sessions a week is £400–500 a month, for one random tutor with no curriculum, no homework support, no replays.\n\nThis is £749.55 for the full year — or 3 x £263 — with [Teacher Name], structured lessons twice a week, workbooks, homework, and video solutions for every question. And you're covered by a 14-day money-back guarantee.\n\nIf the value's there, does price change how you feel?"`} />
-            <span style={{ ...labelStyle, color: colors.warning }}>1. "It's too expensive" / "£749 is a lot"</span>
-            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
-              "Totally understand — £749 feels significant.<br /><br />
-              Quick comparison: a private tutor in the UK charges £40–60 an hour. Two sessions a week is £400–500 a month, for one random tutor with no curriculum, no homework support, no replays.<br /><br />
-              This is <strong>£749.55 for the full year</strong> — or <strong>3 x £263</strong> — with [Teacher Name], structured lessons twice a week, workbooks, homework, and video solutions for every question. And you're covered by a <strong>14-day money-back guarantee</strong>.<br /><br />
-              If the value's there, does price change how you feel?"
-            </p>
-            <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
-              <span style={{ ...labelStyle, color: colors.darkGray }}>STILL HESITANT →</span>
-              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
-                "We can split it into <strong>3 payments of £263</strong> — same full-year access, just spread out. Does that work better?"
-              </p>
-            </div>
-          </div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
-            <CopyBtn id="obj-think" text={`"Completely fair. What's the main thing you're weighing? Is it the price, whether it'll work for [Student], or something else?"\n\n"Here's the thing — you're not going to go home, sit down, and think about maths tuition. You'll get busy, [Student] will have another homework battle, and the trial will expire.\n\nIt doesn't take more time to decide — it takes more information. What question do you still have that I can answer right now?"`} />
-            <span style={{ ...labelStyle, color: colors.warning }}>2. "I need to think about it" / "Let me sleep on it"</span>
-            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
-              "Completely fair. What's the main thing you're weighing? Is it the price, whether it'll work for [Student], or something else?"<br /><br />
-              <em>[Wait for real answer]</em><br /><br />
-              "Here's the thing — you're not going to go home, sit down, and think about maths tuition. You'll get busy, [Student] will have another homework battle, and the trial will expire.<br /><br />
-              <strong>It doesn't take more time to decide — it takes more information. What question do you still have that I can answer right now?</strong>"
-            </p>
-          </div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
-            <CopyBtn id="obj-partner" text={`"Makes complete sense. What do you think they'd want to know most?"\n\n"One option: start the monthly plan tonight at £180. That way you can show your partner what [Student] has been doing — much easier than explaining it. Cancel anytime if they're not happy. Fair?"`} />
-            <span style={{ ...labelStyle, color: colors.warning }}>3. "Need to talk to my partner"</span>
-            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
-              "Makes complete sense. What do you think they'd want to know most?"<br /><br />
-              <em>[Let them name it — then address that specific thing]</em><br /><br />
-              "One option: start the <strong>monthly plan tonight at £180</strong>. That way you can show your partner what [Student] has been doing — much easier than explaining it. Cancel anytime if they're not happy. Fair?"
-            </p>
-          </div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
-            <CopyBtn id="obj-1to1" text={`"That makes sense — 1-to-1 feels more personal. The question is whether personalisation actually drives better results, or whether it's the consistency and curriculum structure that matters.\n\nWhat most parents find is that [Teacher Name] teaches to the group but the workbooks, homework, and replays give [Student] the individual practice. It's the combination that works.\n\nWould you be open to giving them a few more lessons to see? Most students who feel like they need 1-to-1 actually thrive in this format once they're used to it."`} />
-            <span style={{ ...labelStyle, color: colors.warning }}>4. "We prefer 1-to-1 tuition"</span>
-            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
-              "That makes sense — 1-to-1 feels more personal. The question is whether personalisation actually drives better results, or whether it's the consistency and curriculum structure that matters.<br /><br />
-              What most parents find is that [Teacher Name] teaches to the group but the workbooks, homework, and replays give [Student] the individual practice. It's the combination that works.<br /><br />
-              Would you be open to giving them a few more lessons to see? Most students who feel like they need 1-to-1 actually thrive in this format once they're used to it."
-            </p>
-          </div>
-        </>}
         </div>
       </>}
     </div>
