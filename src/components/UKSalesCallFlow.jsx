@@ -182,6 +182,16 @@ export default function UKSalesCallFlow() {
   const [activeObjection, setActiveObjection] = useState(null);
   const [copied, setCopied] = useState(false);
   const [trialSection, setTrialSection] = useState('touches');
+  const [copiedTrial, setCopiedTrial] = useState(null);
+  const copyTrialText = (id, text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedTrial(id);
+      setTimeout(() => setCopiedTrial(null), 1500);
+    }).catch(() => {});
+  };
+  const CopyBtn = ({ id, text }) => (
+    <button onClick={() => copyTrialText(id, text)} style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 10px', background: copiedTrial === id ? colors.success : '#e8e8e8', color: copiedTrial === id ? colors.white : colors.darkGray, border: 'none', fontSize: '10px', fontWeight: '700', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>{copiedTrial === id ? 'COPIED' : 'COPY'}</button>
+  );
   const clearAll = () => {
     setChildren([{ ...emptyChild }]);
     setPainPoints('');
@@ -337,8 +347,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
   const sidebarLabelStyle = { fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', color: colors.darkGray, marginBottom: '4px', marginTop: '12px', display: 'block', letterSpacing: '0.5px', fontFamily: 'Inter, sans-serif' };
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', background: colors.gray, minHeight: '100vh' }}>
-      {/* Header */}
-      <div style={{ background: colors.dark, padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Header — sticky */}
+      <div style={{ background: colors.dark, padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: viewMode === 'trial' ? 'sticky' : 'static', top: viewMode === 'trial' ? 0 : 'auto', zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <h1 style={{ margin: 0, color: colors.white, fontSize: '15px', fontWeight: '700', fontFamily: 'Inter, sans-serif' }}>MyEdSpace</h1>
           <div style={{ display: 'flex', background: '#2a2a3e', borderRadius: 0 }}>
@@ -1049,8 +1059,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
       </div>
       </>}
       {viewMode === 'trial' && <>
-        {/* Trial Track Selector */}
-        <div style={{ background: colors.success, display: 'flex' }}>
+        {/* Trial Track Selector — sticky */}
+        <div style={{ background: colors.success, display: 'flex', position: 'sticky', top: '40px', zIndex: 90 }}>
           {[
             { id: 'A', label: 'TRACK A', desc: 'Never Logged In' },
             { id: 'B1', label: 'TRACK B1', desc: 'Logged In, No Lesson' },
@@ -1061,17 +1071,19 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </button>
           ))}
         </div>
-        {/* Trial Section Tabs */}
-        <div style={{ background: '#f0f0f0', display: 'flex', borderBottom: '1px solid #ddd' }}>
+        {/* Trial Section Tabs — sticky below track selector */}
+        <div style={{ background: '#f0f0f0', display: 'flex', borderBottom: '1px solid #ddd', position: 'sticky', top: '86px', zIndex: 89 }}>
           {[
             { id: 'touches', label: 'TOUCH SEQUENCE' },
             { id: 'objections', label: 'OBJECTION HANDLING' },
-            { id: 'pricing', label: 'PRICING REFERENCE' },
           ].map(sec => (
             <button key={sec.id} onClick={() => setTrialSection(sec.id)} style={{ flex: 1, padding: '10px 8px', border: 'none', background: trialSection === sec.id ? colors.white : 'transparent', color: trialSection === sec.id ? colors.dark : colors.darkGray, cursor: 'pointer', fontSize: '11px', fontWeight: '700', fontFamily: 'Inter, sans-serif', textAlign: 'center', borderBottom: trialSection === sec.id ? `3px solid ${colors.success}` : '3px solid transparent' }}>{sec.label}</button>
           ))}
         </div>
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px 20px' }}>
+        {/* Trial content with pricing sidebar */}
+        <div style={{ display: 'flex', minHeight: 'calc(100vh - 130px)' }}>
+          {/* Main content */}
+          <div style={{ flex: 1, padding: '24px 20px', maxWidth: '800px' }}>
 
         {trialSection === 'touches' && <>
           {/* Track descriptions */}
@@ -1084,7 +1096,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
           {/* TRACK A TOUCHES */}
           {selectedTrack === 'A' && <>
             <div style={sectionHeaderStyle}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T1 · Day 0 · Welcome</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>AUTOMATED · No rep action needed</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t1" text={`Hey [Parent Name],\n\nThank you so much for joining us. We're really excited to have you on board.\n\nYour student account is ready to be set up so you can start learning.\n\nPlease log in here: https://go.myedspace.co.uk/login\n\nTo access the live lessons, quizzes and revision materials, you first need to create your account and set a password.\n\nYou can watch the following video to start getting familiar with our platform: https://www.youtube.com/watch?v=1nH5IbEvB9g\n\nWe look forward to seeing you in class!`} />
               <span style={labelStyle}>Goal: Get them to log in and create their account</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 Hey [Parent Name],<br /><br />
@@ -1098,7 +1111,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={sectionHeaderStyle}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T1b · Day 1 · Login Nudge</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>AUTOMATED · No rep action needed</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t1b" text={`You've got 9 days left of your trial.\n\nLog in today to explore all the study resources available.\n\nHere is a reminder of what you have access to:\nhttps://intercom-help.eu/myedspace/en/articles/397280-timetables-for-2025-26-academic-year`} />
               <span style={labelStyle}>Goal: Remind them trial is active, drive first login</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 You've got 9 days left of your trial.<br /><br />
@@ -1109,7 +1123,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={sectionHeaderStyle}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T1c · Day 3 · One Week Left</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>AUTOMATED · No rep action needed</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t1c" text={`One week left to start improving grades\n\nA quick reminder that your trial is active.\n\nMake sure you log in and make the most of it before time runs out!`} />
               <span style={labelStyle}>Goal: Create urgency at the one-week mark</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 <strong>One week left to start improving grades</strong><br /><br />
@@ -1119,7 +1134,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={sectionHeaderStyle}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T1d · Day 5 · Halfway</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>AUTOMATED · No rep action needed</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t1d" text={`You're halfway through your trial and your classes are waiting.\n\nLogged in yet? If anything's blocked you, reply now and I'll fix it straight away.`} />
               <span style={labelStyle}>Goal: Surface blockers — offer immediate help</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 You're halfway through your trial and your classes are waiting.<br /><br />
@@ -1128,7 +1144,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={sectionHeaderStyle}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T1e · Day 7 · Stop Missing Out</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>AUTOMATED · No rep action needed</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t1e" text={`Stop missing out! 3 days left of your trial.\n\nWe haven't seen any login activity yet. If you still want to test this properly you can try it out today.`} />
               <span style={labelStyle}>Goal: Final automated push. 3 days left.</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 <strong>Stop missing out!</strong> 3 days left of your trial.<br /><br />
@@ -1138,7 +1155,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
 
             <div style={{ ...sectionHeaderStyle, background: colors.warning }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T3 · Day 5 · Escalation Call</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>CALL twice first → WhatsApp if no answer</span></div>
             <div style={warningBoxStyle}><strong>Only call if student has still not logged in by Day 5.</strong></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t3" text={`"Hi, can I speak to [Parent Name]? It's [Your Name] calling from MyEdSpace."\n\n"Hi [Parent Name] — I'm just calling because [Student Name]'s trial started a few days ago but we haven't seen them log in yet, and I didn't want you to lose your trial days. Is everything okay with the setup?"`} />
               <span style={labelStyle}>Goal: First rep contact. Surface and fix login blockers.</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Hi, can I speak to [Parent Name]? It's [Your Name] calling from MyEdSpace."<br /><br />
@@ -1150,7 +1168,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                 → <strong>Too busy:</strong> "Totally fine — the trial is active until [end date]. Please login so you are able to see first hand how incredible our courses can be"<br />
                 → <strong>Changed mind:</strong> "I understand — can I ask what put you off? I want to make sure it's not something we can fix for you."
               </div>
-              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
+              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px', position: 'relative' }}>
+                <CopyBtn id="a-t3-vm" text={`Hey [Parent Name], it's [Your Name] from MyEdSpace — just calling because [Student Name]'s trial is running but they haven't logged in yet. Don't want you to miss out on the days you've paid for! Give me a call back or just reply to this message and we'll get them set up quickly. Speak soon.`} />
                 <span style={{ ...labelStyle, color: colors.darkGray }}>VOICEMAIL</span>
                 <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
                   "Hey [Parent Name], it's [Your Name] from MyEdSpace — just calling because [Student Name]'s trial is running but they haven't logged in yet. Don't want you to miss out on the days you've paid for! Give me a call back or just reply to this message and we'll get them set up quickly. Speak soon."
@@ -1160,7 +1179,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
 
             <div style={{ ...sectionHeaderStyle, background: colors.primary }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T4 · Day 7 · Urgency WhatsApp</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>WhatsApp</span></div>
             <div style={tipBoxStyle}>The 'reply STOP to cancel' creates urgency without pressure. It surfaces parents who are genuinely done — don't waste Touch 5 on them.</div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t4" text={`Hey [Parent Name],\n\n[Student Name] has 3 days left on their trial — and hasn't logged in yet.\n\nYou're due to roll onto the £180/month plan when the trial ends.\n\nIf you'd like to cancel, just reply STOP and I'll take care of it.\n\nBut if you still want to give it a go - now's the time. We have live lessons every day this week. Reply and I'll send you today's schedule.`} />
               <span style={labelStyle}>Goal: Create urgency + surface intent</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 Hey [Parent Name],<br /><br />
@@ -1173,7 +1193,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
 
             <div style={{ ...sectionHeaderStyle, background: colors.dark }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T5 · Day 10 · Final Close</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>CALL first, then WhatsApp</span></div>
             <div style={warningBoxStyle}>Don't spend a full close attempt on a Track A who never logged in. Goal: get them into B1 or close cleanly.</div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="a-t5" text={`FINAL NOTICE - DEADLINE TODAY:\n\n[Parent Name], [Student Name]'s trial ended today.\n\nWe're closing their account unless you'd like to continue.\n\nIf you'd like to keep access going, reply here and I'll set up a call.\nOr you can upgrade directly: [link]\n\nReply STOP to confirm you'd like to cancel. No hard feelings.`} />
               <span style={labelStyle}>FINAL WHATSAPP</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 <strong>FINAL NOTICE - DEADLINE TODAY:</strong><br /><br />
@@ -1190,7 +1211,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
           {selectedTrack === 'B1' && <>
             <div style={sectionHeaderStyle}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T2 · Login Detected · Login Response</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>WhatsApp (rep-sent) · Within 24hrs of login</span></div>
             <div style={warningBoxStyle}>Warm lead. <strong>Don't close on price before they've attended a lesson.</strong> Get them to class first.</div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b1-t2" text={`Hey [Parent Name] — saw [Student Name] has set up their account, nice one!\n\nQuick question: are you exploring the trial to see if the full programme would be right for them?\n\nTheir next live lesson is [Subject] on [Day] at [Time].\n\nThat's the best place to start — 60 minutes with [Teacher Name] and they'll get a real feel for how it works.\n\nAny questions before then? Happy to help.`} />
               <span style={labelStyle}>Goal: Acknowledge login. Direct them to first live lesson.</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 Hey [Parent Name] — saw [Student Name] has set up their account, nice one!<br /><br />
@@ -1203,7 +1225,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
 
             <div style={{ ...sectionHeaderStyle, background: colors.warning }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T3 · Day 3–4 · Check-In Call</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>CALL first → WhatsApp if no answer</span></div>
             <div style={tipBoxStyle}><strong>LISTEN</strong> after each question. Don't rush to price.</div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b1-t3" text={`"Hi [Parent Name], it's [Your Name] from MyEdSpace. Have you got two minutes?"\n\n"Great — I'm just checking in because [Student Name] logged in but hasn't joined a live lesson yet. I wanted to make sure there wasn't anything getting in the way."`} />
               <span style={labelStyle}>Goal: Remove blockers. Bridge to attending first lesson.</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 <strong>OPENING:</strong><br />
@@ -1217,19 +1240,22 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                 → "Is there a subject they're most behind on right now?"<br />
                 → "What made you look into extra support for them?"
               </div>
-              <div style={{ ...scriptBoxStyle, background: colors.accent, marginTop: '12px' }}>
+              <div style={{ ...scriptBoxStyle, background: colors.accent, marginTop: '12px', position: 'relative' }}>
+                <CopyBtn id="b1-t3-bridge" text={`"The best thing I can do for you right now is make sure [Student Name] actually gets into a class — because that's where it clicks. There's a [Subject] lesson today / tomorrow at [Time]. Can we get them in for that one?"`} />
                 <span style={{ ...labelStyle, color: colors.dark }}>BRIDGE TO LESSON</span>
                 <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                   "The best thing I can do for you right now is make sure [Student Name] actually gets into a class — because that's where it clicks. There's a <strong>[Subject]</strong> lesson today / tomorrow at <strong>[Time]</strong>. Can we get them in for that one?"
                 </p>
               </div>
-              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
+              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px', position: 'relative' }}>
+                <CopyBtn id="b1-t3-vm" text={`Hey [Parent Name], [Your Name] from MyEdSpace. Just noticed [Student Name] logged in but hasn't joined a live lesson yet — wanted to check everything's okay and make sure they don't miss out. Give me a call back or text me whenever's good. Speak soon!`} />
                 <span style={{ ...labelStyle, color: colors.darkGray }}>VOICEMAIL</span>
                 <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
                   "Hey [Parent Name], [Your Name] from MyEdSpace. Just noticed [Student Name] logged in but hasn't joined a live lesson yet — wanted to check everything's okay and make sure they don't miss out. Give me a call back or text me whenever's good. Speak soon!"
                 </p>
               </div>
-              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
+              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px', position: 'relative' }}>
+                <CopyBtn id="b1-t3-wa" text={`Hey [Parent Name] — tried to call just now, no worries if it's a bad time.\n\n[Student Name] is all set up but hasn't joined a lesson yet.\n\nThere's a [Subject] class [today/tomorrow] at [Time] — that's the best way to get a proper feel for the programme.\n\nWill you be in attendance?`} />
                 <span style={{ ...labelStyle, color: colors.darkGray }}>WHATSAPP (if no answer on call)</span>
                 <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
                   "Hey [Parent Name] — tried to call just now, no worries if it's a bad time.<br /><br />
@@ -1241,7 +1267,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={{ ...sectionHeaderStyle, background: colors.primary }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T4 · Day 7 · Time-Based Push</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>WhatsApp</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b1-t4" text={`Hey [Parent Name],\n\n[Student Name] has 3 days left of their trial — and they haven't attended a live lesson yet.\n\nThe trial is designed around the live classes - that's the core of what you're testing. Without attending one, you won't really know if it's right for them.\n\nThere's still time: [Subject] lesson on [Day] at [Time].\n\nAre you able to attend?`} />
               <span style={labelStyle}>Goal: Urgency around trial ending without a lesson attended</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 Hey [Parent Name],<br /><br />
@@ -1253,7 +1280,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={{ ...sectionHeaderStyle, background: colors.dark }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T5 · Day 10 · Final Close</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>CALL + WhatsApp</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b1-t5-open" text={`"Hi [Parent Name], [Your Name] from MyEdSpace. [Student Name]'s trial ends today — I wanted to call before it closes."`} />
               <span style={labelStyle}>Goal: Last attempt. Push to lesson or close on what they've seen.</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 <strong>OPENING:</strong><br />
@@ -1263,21 +1291,24 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                 <span style={{ ...labelStyle, color: colors.success }}>IF THEY ATTENDED A LESSON</span>
                 <p style={{ margin: 0, fontSize: '13px' }}>→ Switch to <strong>Track B2 close script</strong>.</p>
               </div>
-              <div style={{ ...scriptBoxStyle, marginTop: '12px' }}>
+              <div style={{ ...scriptBoxStyle, marginTop: '12px', position: 'relative' }}>
+                <CopyBtn id="b1-t5-nolesson" text={`"I know they haven't made it into a live class yet but maybe you had a chance to explore our award-winning learning platform?"`} />
                 <span style={{ ...labelStyle, color: colors.warning }}>IF STILL NO LESSON ATTENDED</span>
                 <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                   "I know they haven't made it into a live class yet but maybe you had a chance to explore our award-winning learning platform?"<br /><br />
                   <em style={{ color: colors.darkGray }}>[If agreed — flag for Sean/manager to approve extension]</em>
                 </p>
               </div>
-              <div style={{ ...scriptBoxStyle, marginTop: '12px' }}>
+              <div style={{ ...scriptBoxStyle, marginTop: '12px', position: 'relative' }}>
+                <CopyBtn id="b1-t5-cancel" text={`"I completely understand. Can I ask — was it the setup, the timing, or something about what you saw that put you off?"`} />
                 <span style={{ ...labelStyle, color: colors.darkGray }}>IF THEY WANT TO CANCEL</span>
                 <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                   "I completely understand. Can I ask — was it the setup, the timing, or something about what you saw that put you off?"<br /><br />
                   <em style={{ color: colors.darkGray }}>[Log reason in CRM — do not push further]</em>
                 </p>
               </div>
-              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
+              <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px', position: 'relative' }}>
+                <CopyBtn id="b1-t5-final" text={`Hey [Parent Name],\n\n[Student Name]'s trial ends today.\n\nThey haven't attended a live lesson yet — which means you haven't really seen what you're buying. That's not a great position to make a decision from.\n\nIf you'd like to upgrade and give it a proper go, reply here.\n\nFull year: £749.55 upfront (or 3x £263)\nMonthly: £180/month - cancel anytime\n14-day money-back guarantee on all plans.\n\nReply STOP if you'd prefer to cancel. No worries at all.`} />
                 <span style={{ ...labelStyle, color: colors.darkGray }}>FINAL WHATSAPP</span>
                 <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
                   "Hey [Parent Name],<br /><br />
@@ -1297,13 +1328,15 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
           {selectedTrack === 'B2' && <>
             <div style={{ ...sectionHeaderStyle, background: colors.success }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T3 · Post-Lesson Close</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>CALL first → WhatsApp if no answer · Call next morning after first lesson</span></div>
             <div style={warningBoxStyle}><strong>Behavioural hooks are active</strong> — endowment effect, commitment, loss aversion. Lead with annual. The sale starts when they object.</div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b2-t3-open" text={`"Hi [Parent Name], it's [Your Name] from MyEdSpace. I saw [Student Name] was in their first lesson yesterday - I just wanted to check in quickly and see how they found it. Have you got two minutes?"`} />
               <span style={labelStyle}>OPENING (30 sec)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Hi [Parent Name], it's [Your Name] from MyEdSpace. I saw [Student Name] was in their first lesson yesterday - I just wanted to check in quickly and see how they found it. Have you got two minutes?"
               </p>
             </div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b2-t3-react" text={`"How did [Student Name] find it?"`} />
               <span style={labelStyle}>REACTION CHECK (1–2 min)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "How did [Student Name] find it?"
@@ -1315,59 +1348,68 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                 → <strong>If negative:</strong> "Tell me more — was it the content, the format, or how it was taught?" [Diagnose first, don't defend]
               </div>
             </div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b2-t3-label" text={`"So from what you're telling me — [Student] engaged, followed along, and [specific thing they said]. Is that right?"\n\n"That matters more than people realise at this stage. Class one is the adjustment."`} />
               <span style={labelStyle}>LABEL THE PROGRESS (30 sec)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "So from what you're telling me — [Student] engaged, followed along, and [specific thing they said]. Is that right?"<br /><br />
                 "That matters more than people realise at this stage. Class one is the adjustment."
               </p>
             </div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b2-t3-pain" text={`"Quick question: when you first signed up — what was the main thing you were hoping this would fix for [Student Name]?"\n\n"And is that still the main thing?"`} />
               <span style={labelStyle}>SURFACE ORIGINAL PAIN (1 min)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Quick question: when you first signed up — what was the main thing you were hoping this would fix for [Student Name]?"<br /><br />
                 "And is that still the main thing?"
               </p>
             </div>
-            <div style={{ ...scriptBoxStyle, background: '#f0fdf4', border: `2px solid ${colors.success}` }}>
+            <div style={{ ...scriptBoxStyle, background: '#f0fdf4', border: `2px solid ${colors.success}`, position: 'relative' }}>
+              <CopyBtn id="b2-t3-pivot" text={`"Here's the thing — and I want to be straight with you. The way the programme works, the first few lessons are foundation. That's when [Student] is building the mental map for everything after it. If you stop now, that foundation doesn't go anywhere useful. The parents who see the biggest change are the ones who lock in through the first 4–6 weeks. That's when results show up."`} />
               <span style={{ ...labelStyle, color: colors.success }}>PROTECT THE PROGRESS PIVOT (1–2 min)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Here's the thing — and I want to be straight with you. The way the programme works, the first few lessons are foundation. That's when [Student] is building the mental map for everything after it. If you stop now, that foundation doesn't go anywhere useful. The parents who see the biggest change are the ones who lock in through the first 4–6 weeks. That's when results show up."
               </p>
             </div>
             <div style={{ ...sectionHeaderStyle, background: colors.dark, marginTop: '20px' }}><h2 style={{ margin: 0, fontSize: '16px', fontWeight: '800' }}>CLOSE — TIERED</h2></div>
-            <div style={{ ...scriptBoxStyle, background: colors.accent }}>
+            <div style={{ ...scriptBoxStyle, background: colors.accent, position: 'relative' }}>
+              <CopyBtn id="b2-tier1" text={`"Here's what most families do after the first class: they lock in the full year. It's £749.55 upfront — or 3 payments of £263 — and [Student] is set through to June. No renewals, no decisions every month. And you're covered by a 14-day money-back guarantee. Should I get [Student Name] set up on the annual?"`} />
               <span style={{ ...labelStyle, color: colors.dark }}>TIER 1 — ANNUAL UPFRONT (lead with this)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Here's what most families do after the first class: they lock in the full year. It's <strong>£749.55 upfront</strong> — or 3 payments of £263 — and [Student] is set through to June. No renewals, no decisions every month. And you're covered by a <strong>14-day money-back guarantee</strong>. Should I get [Student Name] set up on the annual?"<br /><br />
                 <strong style={{ color: colors.success }}>→ If YES: STOP. Confirm. Send payment link. Don't keep talking.</strong>
               </p>
             </div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b2-tier2" text={`"Totally fair. We can do it in 3 payments of £263 instead. Same full-year access, just spread out. Want to go with that?"`} />
               <span style={labelStyle}>TIER 2 — INSTALMENT PLAN</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Totally fair. We can do it in <strong>3 payments of £263</strong> instead. Same full-year access, just spread out. Want to go with that?"
               </p>
             </div>
-            <div style={{ ...scriptBoxStyle, background: '#fafafa' }}>
+            <div style={{ ...scriptBoxStyle, background: '#fafafa', position: 'relative' }}>
+              <CopyBtn id="b2-tier3" text={`"Or we have monthly £180, cancel anytime. Most families start there and switch to annual once they see [Student] getting on well. Want to start monthly?"`} />
               <span style={{ ...labelStyle, color: colors.darkGray }}>TIER 3 — MONTHLY (last resort)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Or we have monthly <strong>£180, cancel anytime</strong>. Most families start there and switch to annual once they see [Student] getting on well. Want to start monthly?"
               </p>
             </div>
-            <div style={{ ...scriptBoxStyle, background: colors.lightBlue }}>
+            <div style={{ ...scriptBoxStyle, background: colors.lightBlue, position: 'relative' }}>
+              <CopyBtn id="b2-bamfam" text={`"Great. I'm sending the payment link now. Once that's done, [Student] is confirmed for [next class date]. Nothing else you need to do — just show up."`} />
               <span style={{ ...labelStyle, color: colors.dark }}>NEXT STEPS (BAMFAM)</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Great. I'm sending the payment link now. Once that's done, [Student] is confirmed for [next class date]. Nothing else you need to do — just show up."
               </p>
             </div>
-            <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
+            <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px', position: 'relative' }}>
+              <CopyBtn id="b2-t3-vm" text={`Hey [Parent Name], [Your Name] from MyEdSpace. Just saw [Student Name] has been in lessons — wanted to check in quickly to see how they're finding it. Give me a call back or text whenever you have two minutes. Would love to hear what they thought. Thanks!`} />
               <span style={{ ...labelStyle, color: colors.darkGray }}>VOICEMAIL</span>
               <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
                 "Hey [Parent Name], [Your Name] from MyEdSpace. Just saw [Student Name] has been in lessons — wanted to check in quickly to see how they're finding it. Give me a call back or text whenever you have two minutes. Would love to hear what they thought. Thanks!"
               </p>
             </div>
-            <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
+            <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px', position: 'relative' }}>
+              <CopyBtn id="b2-t3-wa" text={`Hey [Parent Name] — just saw [Student Name] was in their first lesson. How did they find it? Would love to hear their thoughts.`} />
               <span style={{ ...labelStyle, color: colors.darkGray }}>WHATSAPP (if no answer)</span>
               <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
                 "Hey [Parent Name] — just saw [Student Name] was in their first lesson. How did they find it? Would love to hear their thoughts."<br /><br />
@@ -1376,7 +1418,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={{ ...sectionHeaderStyle, background: colors.primary, marginTop: '24px' }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T4 · Day 7 · Upsell Push</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>WhatsApp</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b2-t4" text={`Hey [Parent Name],\n\n[Student Name]'s trial ends in 3 days. They've been in [X] lessons so far — the progress they've built this week is real, but it needs to continue to stick.\n\nHere's what happens if you don't continue:\nAccess closes. No more live classes, no replays, no homework support. The momentum stops.\n\nHere's what happens if you do:\nThey carry straight on into next week's class without missing a beat.\n\nFull year: £749.55 upfront — or 3 x £263\nMonthly: £180/month, cancel anytime\n14-day money-back guarantee on all options.\n\nReply UPGRADE and I'll get it sorted. Or reply with any questions.`} />
               <span style={labelStyle}>Goal: Loss aversion + momentum framing. Push annual.</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 Hey [Parent Name],<br /><br />
@@ -1393,12 +1436,14 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </div>
 
             <div style={{ ...sectionHeaderStyle, background: colors.dark, marginTop: '24px' }}><h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>T5 · Day 10 · Final Close</h2><span style={{ fontSize: '11px', opacity: 0.8 }}>CALL + WhatsApp</span></div>
-            <div style={scriptBoxStyle}>
+            <div style={{ ...scriptBoxStyle, position: 'relative' }}>
+              <CopyBtn id="b2-t5-open" text={`"Hi [Parent Name], [Your Name] from MyEdSpace. [Student Name]'s trial ends today — I wanted to make sure you had everything you need to make a decision. How are they finding the classes?"`} />
               <span style={labelStyle}>Goal: Hard close. Overcome final objections. Send payment link immediately on yes.</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                 "Hi [Parent Name], [Your Name] from MyEdSpace. [Student Name]'s trial ends today — I wanted to make sure you had everything you need to make a decision. How are they finding the classes?"
               </p>
-              <div style={{ ...scriptBoxStyle, background: '#e8f5e9', marginTop: '12px', border: `2px solid ${colors.success}` }}>
+              <div style={{ ...scriptBoxStyle, background: '#e8f5e9', marginTop: '12px', border: `2px solid ${colors.success}`, position: 'relative' }}>
+                <CopyBtn id="b2-t5-pos" text={`"I'm glad it's been good. Here's the thing: today's the last day, and I'd hate for them to lose the progress they've built. The annual plan is £749.55, or we can do 3 x £263. Which works better for you?"`} />
                 <span style={{ ...labelStyle, color: colors.success }}>IF POSITIVE — CLOSE IMMEDIATELY</span>
                 <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
                   "I'm glad it's been good. Here's the thing: today's the last day, and I'd hate for them to lose the progress they've built. The annual plan is <strong>£749.55</strong>, or we can do <strong>3 x £263</strong>. Which works better for you?"<br /><br />
@@ -1415,7 +1460,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
                 </p>
               </div>
             </div>
-            <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px' }}>
+            <div style={{ ...scriptBoxStyle, background: '#f5f5f5', marginTop: '12px', position: 'relative' }}>
+              <CopyBtn id="b2-t5-final" text={`[Parent Name], [Student Name]'s trial ends today.\n\nThey've attended [X] lessons - don't let that progress stop here.\n\nFull year: £749.55 (or 3 x £263) - set through to June\nMonthly: £180/month - cancel anytime\n14-day money-back guarantee on all plans.\n\nReply UPGRADE and we can discuss the options.\nReply STOP to cancel. No hard feelings.`} />
               <span style={{ ...labelStyle, color: colors.darkGray }}>FINAL WHATSAPP</span>
               <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8' }}>
                 [Parent Name], [Student Name]'s trial ends today.<br /><br />
@@ -1432,7 +1478,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
 
         {trialSection === 'objections' && <>
           <div style={{ ...sectionHeaderStyle, background: colors.warning }}><h2 style={{ margin: 0, fontSize: '22px', fontWeight: '800' }}>TRIAL OBJECTION HANDLING</h2></div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px' }}>
+          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
+            <CopyBtn id="obj-expensive" text={`"Totally understand — £749 feels significant.\n\nQuick comparison: a private tutor in the UK charges £40–60 an hour. Two sessions a week is £400–500 a month, for one random tutor with no curriculum, no homework support, no replays.\n\nThis is £749.55 for the full year — or 3 x £263 — with [Teacher Name], structured lessons twice a week, workbooks, homework, and video solutions for every question. And you're covered by a 14-day money-back guarantee.\n\nIf the value's there, does price change how you feel?"`} />
             <span style={{ ...labelStyle, color: colors.warning }}>1. "It's too expensive" / "£749 is a lot"</span>
             <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
               "Totally understand — £749 feels significant.<br /><br />
@@ -1447,7 +1494,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
               </p>
             </div>
           </div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px' }}>
+          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
+            <CopyBtn id="obj-think" text={`"Completely fair. What's the main thing you're weighing? Is it the price, whether it'll work for [Student], or something else?"\n\n"Here's the thing — you're not going to go home, sit down, and think about maths tuition. You'll get busy, [Student] will have another homework battle, and the trial will expire.\n\nIt doesn't take more time to decide — it takes more information. What question do you still have that I can answer right now?"`} />
             <span style={{ ...labelStyle, color: colors.warning }}>2. "I need to think about it" / "Let me sleep on it"</span>
             <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
               "Completely fair. What's the main thing you're weighing? Is it the price, whether it'll work for [Student], or something else?"<br /><br />
@@ -1456,7 +1504,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
               <strong>It doesn't take more time to decide — it takes more information. What question do you still have that I can answer right now?</strong>"
             </p>
           </div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px' }}>
+          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
+            <CopyBtn id="obj-partner" text={`"Makes complete sense. What do you think they'd want to know most?"\n\n"One option: start the monthly plan tonight at £180. That way you can show your partner what [Student] has been doing — much easier than explaining it. Cancel anytime if they're not happy. Fair?"`} />
             <span style={{ ...labelStyle, color: colors.warning }}>3. "Need to talk to my partner"</span>
             <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
               "Makes complete sense. What do you think they'd want to know most?"<br /><br />
@@ -1464,7 +1513,8 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
               "One option: start the <strong>monthly plan tonight at £180</strong>. That way you can show your partner what [Student] has been doing — much easier than explaining it. Cancel anytime if they're not happy. Fair?"
             </p>
           </div>
-          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px' }}>
+          <div style={{ ...scriptBoxStyle, borderLeft: `4px solid ${colors.warning}`, marginBottom: '14px', position: 'relative' }}>
+            <CopyBtn id="obj-1to1" text={`"That makes sense — 1-to-1 feels more personal. The question is whether personalisation actually drives better results, or whether it's the consistency and curriculum structure that matters.\n\nWhat most parents find is that [Teacher Name] teaches to the group but the workbooks, homework, and replays give [Student] the individual practice. It's the combination that works.\n\nWould you be open to giving them a few more lessons to see? Most students who feel like they need 1-to-1 actually thrive in this format once they're used to it."`} />
             <span style={{ ...labelStyle, color: colors.warning }}>4. "We prefer 1-to-1 tuition"</span>
             <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
               "That makes sense — 1-to-1 feels more personal. The question is whether personalisation actually drives better results, or whether it's the consistency and curriculum structure that matters.<br /><br />
@@ -1473,47 +1523,36 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             </p>
           </div>
         </>}
-
-        {trialSection === 'pricing' && <>
-          <div style={{ ...sectionHeaderStyle, background: colors.dark }}><h2 style={{ margin: 0, fontSize: '22px', fontWeight: '800' }}>PRICING REFERENCE</h2><p style={{ margin: '4px 0 0 0', fontSize: '13px', opacity: 0.9 }}>Ultimate Pass (Primary Product)</p></div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', fontFamily: 'Inter, sans-serif', marginBottom: '20px' }}>
-              <thead>
-                <tr style={{ background: colors.primary, color: colors.white }}>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '700' }}>Tier</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '700' }}>Price</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '700' }}>Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ background: colors.accent }}>
-                  <td style={{ padding: '12px 16px', fontWeight: '700' }}>Annual Upfront</td>
-                  <td style={{ padding: '12px 16px', fontWeight: '700', fontSize: '16px' }}>£749.55</td>
-                  <td style={{ padding: '12px 16px' }}>Lead with this. Or 3 x £263 instalments</td>
-                </tr>
-                <tr style={{ background: colors.white }}>
-                  <td style={{ padding: '12px 16px', fontWeight: '600' }}>3x Instalments</td>
-                  <td style={{ padding: '12px 16px', fontWeight: '600' }}>£263 x 3</td>
-                  <td style={{ padding: '12px 16px' }}>Use if price objection raised</td>
-                </tr>
-                <tr style={{ background: '#f5f5f5' }}>
-                  <td style={{ padding: '12px 16px', fontWeight: '600' }}>Monthly</td>
-                  <td style={{ padding: '12px 16px', fontWeight: '600' }}>£180/month</td>
-                  <td style={{ padding: '12px 16px' }}>Last resort. Cancel anytime</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
-          <div style={{ ...tipBoxStyle, background: '#e8f5e9', borderLeft: `4px solid ${colors.success}` }}>
-            <strong>14-day money-back guarantee on all plans</strong>
+          {/* Pricing sidebar — always visible */}
+          <div style={{ width: '260px', flexShrink: 0, background: colors.white, borderLeft: '1px solid #e0e0e0', padding: '16px', position: 'sticky', top: '126px', alignSelf: 'flex-start', height: 'fit-content' }}>
+            <div style={{ background: colors.dark, padding: '10px 14px', marginBottom: '12px' }}>
+              <p style={{ margin: 0, fontSize: '11px', fontWeight: '700', color: colors.white, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Pricing Reference</p>
+              <p style={{ margin: '2px 0 0 0', fontSize: '10px', color: '#aaa' }}>Ultimate Pass</p>
+            </div>
+            <div style={{ marginBottom: '14px' }}>
+              <div style={{ background: colors.accent, padding: '10px 12px', marginBottom: '1px' }}>
+                <p style={{ margin: 0, fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', color: colors.dark }}>Annual Upfront</p>
+                <p style={{ margin: '2px 0 0 0', fontSize: '18px', fontWeight: '800', color: colors.dark }}>£749.55</p>
+                <p style={{ margin: '2px 0 0 0', fontSize: '10px', color: colors.darkGray }}>or 3 x £263</p>
+              </div>
+              <div style={{ background: '#f5f5f5', padding: '8px 12px', marginBottom: '1px' }}>
+                <p style={{ margin: 0, fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', color: colors.darkGray }}>3x Instalments</p>
+                <p style={{ margin: '2px 0 0 0', fontSize: '15px', fontWeight: '700' }}>£263 x 3</p>
+              </div>
+              <div style={{ background: '#f5f5f5', padding: '8px 12px' }}>
+                <p style={{ margin: 0, fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', color: colors.darkGray }}>Monthly</p>
+                <p style={{ margin: '2px 0 0 0', fontSize: '15px', fontWeight: '700' }}>£180/mo</p>
+                <p style={{ margin: '2px 0 0 0', fontSize: '10px', color: colors.darkGray }}>Cancel anytime. Last resort.</p>
+              </div>
+            </div>
+            <div style={{ background: '#e8f5e9', padding: '8px 12px', fontSize: '11px', fontWeight: '600', color: colors.success }}>
+              14-day money-back guarantee
+            </div>
+            <div style={{ background: '#fff3e0', padding: '8px 12px', marginTop: '8px', fontSize: '10px', color: colors.warning }}>
+              <strong>Single subject:</strong> TBC
+            </div>
           </div>
-          <div style={{ ...scriptBoxStyle, background: '#fff3e0', marginTop: '16px', borderLeft: `4px solid ${colors.warning}` }}>
-            <span style={{ ...labelStyle, color: colors.warning }}>SINGLE SUBJECT — DOWNSELL</span>
-            <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.8', color: colors.darkGray }}>
-              All single subject prices are <strong>TBC</strong>. Same tier structure applies (annual / instalments / monthly).
-            </p>
-          </div>
-        </>}
         </div>
       </>}
     </div>
