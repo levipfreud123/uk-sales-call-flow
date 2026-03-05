@@ -279,8 +279,12 @@ export default function UKSalesCallFlow() {
     const fullPrice = prices[0].annual;
     const discountedPrices = prices.slice(1).map(p => p.annual * 0.8);
     const total = fullPrice + discountedPrices.reduce((a, b) => a + b, 0);
+    const monthlyPrices = children.map(c => ({ ...getPricing(c), childName: c.name })).sort((a, b) => b.monthly - a.monthly);
+    const totalMonthly = monthlyPrices[0].monthly + monthlyPrices.slice(1).reduce((acc, p) => acc + p.monthly * 0.8, 0);
     return {
       total, phoneTotal: (total * 0.95).toFixed(2),
+      totalMonthly,
+      monthlyBreakdown: monthlyPrices.map((p, i) => ({ ...p, discounted: i > 0, finalMonthly: i === 0 ? p.monthly : p.monthly * 0.8 })),
       breakdown: prices.map((p, i) => ({ ...p, discounted: i > 0, finalPrice: i === 0 ? p.annual : p.annual * 0.8 })),
       instalments3: (total / 3).toFixed(2), upfront: (total * 0.95).toFixed(2),
     };
@@ -833,7 +837,25 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
             <div style={{ ...scriptBoxStyle, background: '#fafafa', marginTop: '20px' }}>
               <span style={{ ...labelStyle, color: colors.darkGray }}>IF HESITANT → MONTHLY DOWNSELL</span>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
-                "Or if you'd prefer flexibility, we have monthly at <strong>£{primaryPricing.monthly}/month</strong> - no lock-in, cancel anytime.{isExamYear(primaryChild.yearGroup) && <><br /><br /><em style={{ color: colors.warning }}>Note: Monthly doesn't include Easter Revision or Cram Course.</em></>}"
+                {hasSiblings ? (
+                  <>
+                    "Or if you'd prefer flexibility, we have monthly options too - no lock-in, cancel anytime.
+                    <br /><br />
+                    That would be <strong>£{priceInfo.totalMonthly.toFixed(2)}/month total</strong> for all {children.length} children:
+                    <br />
+                    {priceInfo.monthlyBreakdown.map((child, i) => (
+                      <span key={i}>
+                        • {child.childName || `Child ${i + 1}`}: <strong>£{child.finalMonthly.toFixed(2)}/month</strong>{child.discounted && <em style={{ color: colors.success }}> (20% sibling discount)</em>}
+                        <br />
+                      </span>
+                    ))}
+                    {children.some(c => isExamYear(c.yearGroup)) && <><br /><em style={{ color: colors.warning }}>Note: Monthly doesn't include Easter Revision or Cram Course.</em></>}"
+                  </>
+                ) : (
+                  <>
+                    "Or if you'd prefer flexibility, we have monthly at <strong>£{primaryPricing.monthly}/month</strong> - no lock-in, cancel anytime.{isExamYear(primaryChild.yearGroup) && <><br /><br /><em style={{ color: colors.warning }}>Note: Monthly doesn't include Easter Revision or Cram Course.</em></>}"
+                  </>
+                )}
               </p>
             </div>
             <div style={{ ...scriptBoxStyle, background: '#fff8f0' }}>
