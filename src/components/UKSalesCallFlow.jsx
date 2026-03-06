@@ -408,9 +408,9 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
         const yg = primaryChild.yearGroup || 'Year 7';
         const ygMulti = primaryChild.yearGroup || 'Year 10';
         const tiers = [
-          { label: '1 Subject', short: '1P', tier: 1, count: 1 },
-          { label: '2 Subjects', short: '2P', tier: 2, count: 2 },
-          { label: 'Ultimate Pass', short: 'UP', tier: 'ultimate', count: 3 }
+          { label: '1 Subject', short: '1 Subject', tier: 1, count: 1 },
+          { label: '2 Subjects', short: '2 Subjects', tier: 2, count: 2 },
+          { label: 'Ultimate Pass', short: 'Ultimate Pass', tier: 'ultimate', count: 3 }
         ];
         const thStyle = { textAlign: 'center', padding: '8px 10px', fontSize: '11px', fontWeight: '800', color: colors.white, background: colors.primary, letterSpacing: '0.5px' };
         const tdLabel = { padding: '6px 10px', fontWeight: '600', fontSize: '12px', color: colors.dark, whiteSpace: 'nowrap' };
