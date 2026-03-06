@@ -404,158 +404,137 @@ ${additionalNotes ? `\nNotes: ${additionalNotes}` : ''}`;
         ))}
       </div>
       {/* Collapsible Pricing Reference Panel */}
-      {showSalesPricing && <div style={{ background: '#f0f4ff', borderBottom: `3px solid ${colors.primary}`, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '16px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <span style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: colors.primary, fontFamily: 'Inter, sans-serif' }}>
-              Pricing Reference {isPro && <span style={{ color: colors.pro }}>— PRO</span>}
-            </span>
-            <button onClick={() => setShowSalesPricing(false)} style={{ padding: '2px 8px', background: 'transparent', border: '1px solid #ccc', color: colors.darkGray, fontSize: '10px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>CLOSE</button>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {/* Annual — Current Year */}
-            <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0' }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '11px', fontWeight: '700', color: colors.primary, fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Annual — Current Year</p>
-              <table style={{ width: '100%', fontSize: '12px', fontFamily: 'Inter, sans-serif', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #e0e0e0' }}>
-                    <th style={{ textAlign: 'left', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Tier</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Price</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Was</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Save</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Per Lesson</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[{ label: '1 Subject', tier: 1, count: 1 }, { label: '2 Subjects', tier: 2, count: 2 }, { label: 'Ultimate', tier: 'ultimate', count: 3 }].map(row => {
-                    const annual = pricing.currentYear[row.tier].annual;
-                    const yg = primaryChild.yearGroup || 'Year 7';
-                    const original = isPro ? getProOriginalPrice(yg, row.count, false) : getOriginalPrice(yg, row.count, false);
-                    const lessons = getLessonsForYearGroup(yg, row.count, false);
-                    return (
-                      <tr key={row.tier} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                        <td style={{ padding: '5px 6px', fontWeight: '600' }}>{row.label}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', fontWeight: '700' }}>£{annual}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.darkGray, textDecoration: 'line-through' }}>£{original}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(original - annual).toFixed(0)}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.primary, fontWeight: '600' }}>£{(annual / lessons).toFixed(2)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <p style={{ margin: '6px 0 0 0', fontSize: '10px', color: colors.darkGray, fontStyle: 'italic' }}>Based on {primaryChild.yearGroup || 'Year 7'} lesson counts</p>
+      {showSalesPricing && (() => {
+        const yg = primaryChild.yearGroup || 'Year 7';
+        const ygMulti = primaryChild.yearGroup || 'Year 10';
+        const tiers = [
+          { label: '1 Subject', short: '1P', tier: 1, count: 1 },
+          { label: '2 Subjects', short: '2P', tier: 2, count: 2 },
+          { label: 'Ultimate Pass', short: 'UP', tier: 'ultimate', count: 3 }
+        ];
+        const thStyle = { textAlign: 'center', padding: '8px 10px', fontSize: '11px', fontWeight: '800', color: colors.white, background: colors.primary, letterSpacing: '0.5px' };
+        const tdLabel = { padding: '6px 10px', fontWeight: '600', fontSize: '12px', color: colors.dark, whiteSpace: 'nowrap' };
+        const tdVal = { padding: '6px 10px', textAlign: 'center', fontSize: '12px', fontWeight: '600' };
+        const sectionRow = (label, bg) => (
+          <tr><td colSpan={4} style={{ padding: '8px 10px', fontSize: '10px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', color: colors.primary, background: bg || '#f0f4ff', borderTop: '2px solid #e0e0e0' }}>{label}</td></tr>
+        );
+        return (
+        <div style={{ background: '#f0f4ff', borderBottom: `3px solid ${colors.primary}`, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <div style={{ maxWidth: '820px', margin: '0 auto', padding: '14px 20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: colors.primary, fontFamily: 'Inter, sans-serif' }}>
+                Pricing Reference {isPro && <span style={{ color: colors.pro }}>— PRO</span>}
+                <span style={{ fontSize: '10px', fontWeight: '500', color: colors.darkGray, textTransform: 'none', marginLeft: '10px' }}>Based on {primaryChild.yearGroup || 'Year 7/10'} lesson counts</span>
+              </span>
+              <button onClick={() => setShowSalesPricing(false)} style={{ padding: '2px 8px', background: 'transparent', border: '1px solid #ccc', color: colors.darkGray, fontSize: '10px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderRadius: 0 }}>CLOSE</button>
             </div>
-            {/* Annual — Multi-Year */}
-            <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0' }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '11px', fontWeight: '700', color: colors.primary, fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Annual — Multi-Year</p>
+            <div style={{ background: colors.white, border: '1px solid #e0e0e0', overflow: 'hidden' }}>
               <table style={{ width: '100%', fontSize: '12px', fontFamily: 'Inter, sans-serif', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #e0e0e0' }}>
-                    <th style={{ textAlign: 'left', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Tier</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Price</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Was</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Save</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Per Lesson</th>
+                  <tr>
+                    <th style={{ ...thStyle, background: colors.dark, textAlign: 'left', width: '35%' }}></th>
+                    {tiers.map(t => (
+                      <th key={t.tier} style={{ ...thStyle, width: '21.66%' }}>{t.short}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {[{ label: '1 Subject', tier: 1, count: 1 }, { label: '2 Subjects', tier: 2, count: 2 }, { label: 'Ultimate', tier: 'ultimate', count: 3 }].map(row => {
-                    const annual = pricing.multiYear[row.tier].annual;
-                    const yg = primaryChild.yearGroup || 'Year 10';
-                    const original = isPro ? getProOriginalPrice(yg, row.count, true) : getOriginalPrice(yg, row.count, true);
-                    const lessons = getLessonsForYearGroup(yg, row.count, true);
-                    return (
-                      <tr key={row.tier} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                        <td style={{ padding: '5px 6px', fontWeight: '600' }}>{row.label}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', fontWeight: '700' }}>£{annual}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.darkGray, textDecoration: 'line-through' }}>£{original}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(original - annual).toFixed(0)}</td>
-                        <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.primary, fontWeight: '600' }}>£{(annual / lessons).toFixed(2)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <p style={{ margin: '6px 0 0 0', fontSize: '10px', color: colors.darkGray, fontStyle: 'italic' }}>Based on {primaryChild.yearGroup || 'Year 10'} lesson counts (multi-year)</p>
-            </div>
-            {/* Monthly Pricing */}
-            <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0' }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '11px', fontWeight: '700', color: colors.darkGray, fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Monthly (Cancel Anytime)</p>
-              <table style={{ width: '100%', fontSize: '12px', fontFamily: 'Inter, sans-serif', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #e0e0e0' }}>
-                    <th style={{ textAlign: 'left', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Tier</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Per Month</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Annual Equiv.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[{ label: '1 Subject', tier: 1 }, { label: '2 Subjects', tier: 2 }, { label: 'Ultimate', tier: 'ultimate' }].map(row => (
-                    <tr key={row.tier} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                      <td style={{ padding: '5px 6px', fontWeight: '600' }}>{row.label}</td>
-                      <td style={{ padding: '5px 6px', textAlign: 'right', fontWeight: '700' }}>£{pricing.monthly[row.tier]}/mo</td>
-                      <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.darkGray }}>£{(pricing.monthly[row.tier] * 12).toLocaleString()}/yr</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ marginTop: '8px', padding: '6px 8px', background: '#fff3e0', fontSize: '10px', color: colors.warning, fontWeight: '600' }}>
-                Monthly does NOT include Easter Revision or Cram Course
-              </div>
-            </div>
-            {/* Payment Options */}
-            <div style={{ background: colors.white, padding: '12px 14px', border: '1px solid #e0e0e0' }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '11px', fontWeight: '700', color: colors.success, fontFamily: 'Inter, sans-serif', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Options</p>
-              <table style={{ width: '100%', fontSize: '12px', fontFamily: 'Inter, sans-serif', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #e0e0e0' }}>
-                    <th style={{ textAlign: 'left', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Option</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>1 Subj</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>2 Subj</th>
-                    <th style={{ textAlign: 'right', padding: '4px 6px', fontSize: '10px', color: colors.darkGray }}>Ultimate</th>
-                  </tr>
-                </thead>
-                <tbody>
+                  {sectionRow('Current Year — Annual')}
                   <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                    <td style={{ padding: '5px 6px', fontWeight: '600' }}>3x Instal.</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.currentYear[1].annual / 3).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.currentYear[2].annual / 3).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.currentYear.ultimate.annual / 3).toFixed(2)}</td>
+                    <td style={tdLabel}>Annual Price</td>
+                    {tiers.map(t => <td key={t.tier} style={{ ...tdVal, fontWeight: '800', fontSize: '13px' }}>£{pricing.currentYear[t.tier].annual}</td>)}
                   </tr>
-                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#f8f9ff' }}>
-                    <td style={{ padding: '5px 6px', fontWeight: '600' }}>3x (Multi-Yr)</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.multiYear[1].annual / 3).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.multiYear[2].annual / 3).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.multiYear.ultimate.annual / 3).toFixed(2)}</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#f8f9ff' }}>
-                    <td style={{ padding: '5px 6px', fontWeight: '600' }}>6x (Multi-Yr)</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.multiYear[1].annual / 6).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.multiYear[2].annual / 6).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right' }}>£{(pricing.multiYear.ultimate.annual / 6).toFixed(2)}</td>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#fafafa' }}>
+                    <td style={tdLabel}><span style={{ color: colors.darkGray }}>Was</span></td>
+                    {tiers.map(t => {
+                      const orig = isPro ? getProOriginalPrice(yg, t.count, false) : getOriginalPrice(yg, t.count, false);
+                      return <td key={t.tier} style={{ ...tdVal, color: colors.darkGray, textDecoration: 'line-through', fontWeight: '400' }}>£{orig}</td>;
+                    })}
                   </tr>
                   <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                    <td style={{ padding: '5px 6px', fontWeight: '600', color: colors.success }}>Upfront (5% off)</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(pricing.currentYear[1].annual * 0.95).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(pricing.currentYear[2].annual * 0.95).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(pricing.currentYear.ultimate.annual * 0.95).toFixed(2)}</td>
+                    <td style={tdLabel}><span style={{ color: colors.success }}>Saving</span></td>
+                    {tiers.map(t => {
+                      const orig = isPro ? getProOriginalPrice(yg, t.count, false) : getOriginalPrice(yg, t.count, false);
+                      return <td key={t.tier} style={{ ...tdVal, color: colors.success }}>£{(orig - pricing.currentYear[t.tier].annual).toFixed(0)}</td>;
+                    })}
                   </tr>
-                  <tr style={{ background: '#f8f9ff' }}>
-                    <td style={{ padding: '5px 6px', fontWeight: '600', color: colors.success }}>Upfront Multi-Yr</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(pricing.multiYear[1].annual * 0.95).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(pricing.multiYear[2].annual * 0.95).toFixed(2)}</td>
-                    <td style={{ padding: '5px 6px', textAlign: 'right', color: colors.success, fontWeight: '600' }}>£{(pricing.multiYear.ultimate.annual * 0.95).toFixed(2)}</td>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#fafafa' }}>
+                    <td style={tdLabel}><span style={{ color: colors.primary }}>Per Lesson</span></td>
+                    {tiers.map(t => {
+                      const lessons = getLessonsForYearGroup(yg, t.count, false);
+                      return <td key={t.tier} style={{ ...tdVal, color: colors.primary }}>£{(pricing.currentYear[t.tier].annual / lessons).toFixed(2)}</td>;
+                    })}
+                  </tr>
+
+                  {sectionRow('Multi-Year — Annual')}
+                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={tdLabel}>Annual Price</td>
+                    {tiers.map(t => <td key={t.tier} style={{ ...tdVal, fontWeight: '800', fontSize: '13px' }}>£{pricing.multiYear[t.tier].annual}</td>)}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#fafafa' }}>
+                    <td style={tdLabel}><span style={{ color: colors.darkGray }}>Was</span></td>
+                    {tiers.map(t => {
+                      const orig = isPro ? getProOriginalPrice(ygMulti, t.count, true) : getOriginalPrice(ygMulti, t.count, true);
+                      return <td key={t.tier} style={{ ...tdVal, color: colors.darkGray, textDecoration: 'line-through', fontWeight: '400' }}>£{orig}</td>;
+                    })}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={tdLabel}><span style={{ color: colors.success }}>Saving</span></td>
+                    {tiers.map(t => {
+                      const orig = isPro ? getProOriginalPrice(ygMulti, t.count, true) : getOriginalPrice(ygMulti, t.count, true);
+                      return <td key={t.tier} style={{ ...tdVal, color: colors.success }}>£{(orig - pricing.multiYear[t.tier].annual).toFixed(0)}</td>;
+                    })}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#fafafa' }}>
+                    <td style={tdLabel}><span style={{ color: colors.primary }}>Per Lesson</span></td>
+                    {tiers.map(t => {
+                      const lessons = getLessonsForYearGroup(ygMulti, t.count, true);
+                      return <td key={t.tier} style={{ ...tdVal, color: colors.primary }}>£{(pricing.multiYear[t.tier].annual / lessons).toFixed(2)}</td>;
+                    })}
+                  </tr>
+
+                  {sectionRow('Payment Options')}
+                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={tdLabel}>3x Instalments</td>
+                    {tiers.map(t => <td key={t.tier} style={tdVal}>£{(pricing.currentYear[t.tier].annual / 3).toFixed(2)}</td>)}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#fafafa' }}>
+                    <td style={tdLabel}>3x (Multi-Year)</td>
+                    {tiers.map(t => <td key={t.tier} style={tdVal}>£{(pricing.multiYear[t.tier].annual / 3).toFixed(2)}</td>)}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={tdLabel}>6x (Multi-Year)</td>
+                    {tiers.map(t => <td key={t.tier} style={tdVal}>£{(pricing.multiYear[t.tier].annual / 6).toFixed(2)}</td>)}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0', background: '#e8f5e9' }}>
+                    <td style={{ ...tdLabel, color: colors.success }}>Upfront (5% off)</td>
+                    {tiers.map(t => <td key={t.tier} style={{ ...tdVal, color: colors.success, fontWeight: '700' }}>£{(pricing.currentYear[t.tier].annual * 0.95).toFixed(2)}</td>)}
+                  </tr>
+                  <tr style={{ background: '#e8f5e9' }}>
+                    <td style={{ ...tdLabel, color: colors.success }}>Upfront Multi-Yr</td>
+                    {tiers.map(t => <td key={t.tier} style={{ ...tdVal, color: colors.success, fontWeight: '700' }}>£{(pricing.multiYear[t.tier].annual * 0.95).toFixed(2)}</td>)}
+                  </tr>
+
+                  {sectionRow('Monthly (Cancel Anytime)')}
+                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={tdLabel}>Per Month</td>
+                    {tiers.map(t => <td key={t.tier} style={{ ...tdVal, fontWeight: '800', fontSize: '13px' }}>£{pricing.monthly[t.tier]}</td>)}
+                  </tr>
+                  <tr>
+                    <td style={{ ...tdLabel, color: colors.darkGray, fontWeight: '400' }}>Annual Equiv.</td>
+                    {tiers.map(t => <td key={t.tier} style={{ ...tdVal, color: colors.darkGray, fontWeight: '400' }}>£{(pricing.monthly[t.tier] * 12).toLocaleString()}</td>)}
                   </tr>
                 </tbody>
               </table>
-              <div style={{ marginTop: '8px', padding: '6px 8px', background: '#e8f5e9', fontSize: '10px', color: colors.success, fontWeight: '600' }}>
-                14-day money-back guarantee on all plans
-              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+              <div style={{ flex: 1, padding: '6px 10px', background: '#e8f5e9', fontSize: '10px', color: colors.success, fontWeight: '600', textAlign: 'center' }}>14-day money-back guarantee on all plans</div>
+              <div style={{ flex: 1, padding: '6px 10px', background: '#fff3e0', fontSize: '10px', color: colors.warning, fontWeight: '600', textAlign: 'center' }}>Monthly does NOT include Easter Revision or Cram Course</div>
+              <div style={{ flex: 1, padding: '6px 10px', background: '#f0f4ff', fontSize: '10px', color: colors.primary, fontWeight: '600', textAlign: 'center' }}>20% sibling discount on additional children</div>
             </div>
           </div>
-        </div>
-      </div>}
+        </div>);
+      })()}
       <div style={{ display: 'flex', minHeight: 'calc(100vh - 88px)' }}>
         {/* Left Sidebar */}
         <div style={{ width: '220px', background: colors.white, borderRight: '1px solid #e0e0e0', padding: '14px', overflowY: 'auto', fontSize: '12px', fontFamily: 'Inter, sans-serif' }}>
